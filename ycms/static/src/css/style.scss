@@ -1,0 +1,421 @@
+// Copyright [2019] [Integreat Project]
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+body,
+html {
+    @apply h-full dark:bg-gray-900;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+h1 {
+    @apply text-3xl font-bold dark:text-white;
+}
+
+h2 {
+    @apply text-3xl font-medium text-gray-500 dark:text-white;
+}
+
+p {
+    @apply text-gray-700 dark:text-gray-200;
+}
+
+/*********
+ * FORMS *
+ *********/
+
+[type="text"],
+[type="email"],
+[type="url"],
+[type="password"],
+[type="number"],
+[type="date"],
+[type="datetime-local"],
+[type="month"],
+[type="search"],
+[type="tel"],
+[type="time"],
+[type="week"],
+[multiple],
+.ts-control,
+textarea,
+select {
+    @apply scroll-mt-40 w-full rounded text-xl text-gray-800 border-gray-500 shadow-md dark:text-white dark:border-gray-600 dark:bg-gray-700 #{!important};
+
+    &:focus {
+        @apply bg-white border-blue-500 ring-blue-500 dark:bg-gray-700 dark:border-blue-500 dark:ring-blue-500 dark:focus:border-blue-500 #{!important};
+    }
+
+    &.border-red-500 {
+        border-color: rgb(239, 68, 68);
+    }
+
+    &.rounded-r-none {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    &:disabled {
+        @apply text-gray-500 bg-gray-100 pointer-events-none cursor-not-allowed dark:text-gray-400 dark:bg-gray-700;
+    }
+}
+
+.option {
+    @apply text-gray-800 dark:text-white dark:bg-gray-700;
+}
+
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+// All of the above except "select" and "multiple" which are read-only even when they can be edited
+[type="text"],
+[type="email"],
+[type="url"],
+[type="password"],
+[type="number"],
+[type="date"],
+[type="datetime-local"],
+[type="month"],
+[type="search"],
+[type="tel"],
+[type="time"],
+[type="week"],
+textarea {
+    &:read-only {
+        @apply text-gray-500 pointer-events-none cursor-not-allowed dark:text-gray-400 dark:bg-gray-700;
+    }
+}
+
+[type="checkbox"],
+[type="radio"] {
+    @apply rounded text-blue-500 mr-2 align-text-top bg-white dark:bg-gray-700;
+
+    &:disabled,
+    &.fake-disable {
+        @apply bg-gray-200 border-gray-200 pointer-events-none cursor-not-allowed dark:bg-gray-700 dark:border-gray-700 dark:text-gray-400;
+
+        &:checked {
+            @apply bg-gray-400 border-gray-400 dark:bg-gray-600 dark:border-gray-600;
+        }
+    }
+
+    &.hidden {
+        display: none;
+    }
+}
+
+label {
+    @apply block mt-4 mb-2 text-lg font-bold text-gray-500 cursor-pointer align-middle dark:text-gray-200;
+
+    [type="radio"] {
+        @apply align-baseline;
+    }
+}
+
+label.secondary,
+li > label {
+    @apply text-base;
+}
+
+label.my-0 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+label:not([for]) {
+    @apply cursor-auto;
+}
+
+[type="checkbox"] + label,
+[type="radio"] + label {
+    @apply inline-block;
+}
+
+.helptext,
+.help-text {
+    @apply mt-1 mb-2 text-gray-500 text-base dark:text-gray-400;
+}
+
+.field-required {
+    &:after {
+        content: "*";
+        margin-left: 0.1em;
+    }
+}
+
+.document-deletion-checkbox {
+    label {
+        display: inline;
+        @apply font-medium text-gray-500 text-lg dark:text-gray-400;
+        cursor: auto;
+    }
+
+    input {
+        @apply hidden;
+    }
+}
+
+.errorlist {
+    @apply bg-red-100 border-l-4 border-red-500 text-red-500 px-4 py-3 mb-5;
+}
+
+.ts-dropdown,
+.ts-control,
+.ts-control input {
+    font-family: inherit !important;
+    line-height: inherit !important;
+}
+
+.ts-dropdown {
+    font-size: inherit !important;
+}
+
+#id_unknown-gender,
+#id_gender,
+#id_insurance_type,
+.radio-row div {
+    @apply flex justify-start gap-4;
+}
+
+/***********
+ * BUTTONS *
+ ***********/
+
+button,
+a,
+input[type="submit"] {
+    // Normal buttons
+    &.btn {
+        @apply inline-block text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 rounded px-5 py-2.5;
+
+        svg {
+            @apply pr-1;
+        }
+
+        &.btn-outline {
+            @apply border-2 border-blue-600 text-white bg-transparent;
+
+            &:hover {
+                @apply bg-blue-800 border-blue-800 text-white;
+            }
+        }
+
+        &.btn-outline-plain {
+            @apply border border-gray-500 text-gray-800 bg-white flex-shrink-0 font-normal py-1 px-2 dark:border-gray-400 dark:text-white dark:bg-gray-700;
+
+            &:hover {
+                @apply border-blue-500 text-blue-500 dark:border-blue-300 dark:text-blue-300;
+            }
+        }
+
+        &:focus {
+            @apply outline-none;
+        }
+
+        &:disabled,
+        &[disabled] {
+            @apply bg-gray-400 cursor-not-allowed;
+        }
+
+        // Different types of buttons
+        &.btn-small {
+            @apply py-2 px-3;
+        }
+
+        &.btn-red {
+            @apply bg-red-500;
+
+            &:hover {
+                @apply bg-red-600;
+            }
+        }
+
+        // Override base styles
+        &.hidden {
+            display: none;
+        }
+    }
+
+    // Icon buttons
+    &.btn-icon {
+        @apply text-gray-800;
+
+        // Pseudo-classes
+        &:hover {
+            @apply text-blue-500;
+        }
+
+        &:disabled,
+        &[disabled] {
+            @apply text-gray-400 cursor-not-allowed;
+        }
+    }
+}
+
+/**************
+* TITLE IMAGE *
+**************/
+
+.title-image-preview-container {
+    width: 16rem;
+    height: 16rem;
+    overflow: hidden;
+
+    &:hover {
+        .darken {
+            @apply opacity-60;
+        }
+
+        svg {
+            @apply opacity-100;
+        }
+    }
+}
+
+/***********
+* MESSAGES *
+***********/
+
+.message {
+    @apply pl-4 pr-10 py-3 mb-5 rounded-lg relative duration-700 opacity-100 shadow-xl self-end;
+
+    .message-close {
+        @apply w-5 h-5 absolute top-3 right-3 cursor-pointer;
+        @apply dark:text-white hover:dark:bg-gray-600;
+    }
+}
+
+/***********
+* SIDEBAR *
+***********/
+
+#sidebar li {
+    @apply list-none;
+}
+
+#sidebar li a {
+    @apply px-5 flex items-center h-11 tracking-wide text-gray-600 border-l-4 border-transparent hover:text-gray-800 hover:bg-gray-100 hover:border-blue-500 leading-4;
+    @apply dark:text-white hover:dark:bg-gray-600;
+}
+
+#sidebar li a.selected {
+    @apply pl-6 text-gray-800 bg-gray-200 border-blue-500;
+    @apply dark:bg-gray-600 dark:text-white;
+}
+
+#sidebar li a svg {
+    @apply w-[22px] mr-2;
+}
+
+.filter-white {
+    filter: invert(99%) sepia(0%) saturate(3987%) hue-rotate(106deg) brightness(116%) contrast(100%);
+}
+
+#sidebar {
+    transition: all 0.3s ease;
+
+    &:hover {
+        @apply text-blue-500;
+    }
+
+    @apply dark:text-white dark:bg-gray-700;
+}
+
+#sidebarOpen,
+#sidebarClose {
+    transition: all 0.3s ease;
+
+    &:hover {
+        @apply text-blue-500;
+    }
+
+    @apply dark:text-white;
+}
+
+.progress-bar {
+    width: var(--progress-width, 0%);
+}
+
+/***********
+* TIMELINE *
+***********/
+
+.vis-rolling-mode-btn {
+    display: none;
+}
+
+.vis-item {
+    .vis-item-content {
+        padding: 2px 5px !important;
+    }
+}
+
+.vis-item.m {
+    @apply bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-100 dark:border-blue-800 border-2;
+}
+
+.vis-item.f {
+    @apply bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-100 dark:border-red-800 border-2;
+}
+
+.vis-item.d {
+    @apply bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-100 dark:border-green-800 border-2;
+}
+
+.vis-item.changed,
+.vis-item.vis-selected {
+    @apply border-dashed #{!important};
+
+    &.m {
+        @apply border-blue-800 bg-blue-100/50 dark:bg-blue-900/50 #{!important};
+    }
+
+    &.f {
+        @apply border-red-800 bg-red-100/50 dark:bg-red-900/50 #{!important};
+    }
+
+    &.d {
+        @apply border-green-800 bg-green-100/50 bg-green-900/50 #{!important};
+    }
+}
+
+.vis-labelset .vis-inner span {
+    @apply text-sm align-top;
+}
+
+.vis-time-axis .vis-text,
+.vis-label .vis-inner {
+    @apply dark:text-gray-300;
+}
+
+#patients {
+    table {
+        @apply block lg:table;
+    }
+    tr {
+        @apply block lg:table-row;
+    }
+    td {
+        @apply block lg:table-cell;
+    }
+    th {
+        @apply hidden lg:table-cell;
+    }
+}

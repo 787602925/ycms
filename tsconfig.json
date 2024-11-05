@@ -1,0 +1,41 @@
+// Copyright [2019] [Integreat Project]
+// Copyright [2023] [YCMS]
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+{
+  /* Visit https://aka.ms/tsconfig.json to read more about this file */
+  "compilerOptions": {
+    /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
+    "target": "es6",
+    /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
+    "module": "commonjs",
+    /* Specify JSX code generation: 'preserve', 'react-native', 'react', 'react-jsx' or 'react-jsxdev'. */
+    "jsx": "react-jsx",
+    /* Declares the module specifier to be used for importing the jsx and jsxs factory functions when using jsx as "react-jsx". */
+    "jsxImportSource": "preact",
+    /* Generates corresponding '.map' file. */
+    "sourceMap": true,
+    /* Enable all strict type-checking options. */
+    "strict": true,
+    /* Enable strict null checks. */
+    "strictNullChecks": true,
+    /* List of folders to include type definitions from. */
+    "typeRoots": ["ycms/static/src/types", "node_modules/@types"],
+    /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "esModuleInterop": true,
+    /* Skip type checking of declaration files. */
+    "skipLibCheck": true,
+    /* Disallow inconsistently-cased references to the same file. */
+    "forceConsistentCasingInFileNames": true
+  }
+}

@@ -1,0 +1,309 @@
+# Copyright [2019] [Integreat Project]
+# Copyright [2023] [YCMS]
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+version: 2.1
+
+orbs:
+  shellcheck: circleci/shellcheck@3.1.2
+
+jobs:
+  pip-install:
+    docker:
+      - image: cimg/python:3.9.16
+    resource_class: small
+    steps:
+      - checkout
+      - restore_cache:
+          key: pip-{{ checksum "pyproject.toml" }}-v1
+      - run:
+          name: Install pip dependencies
+          command: |
+            if [[ -d ".venv" ]]; then
+              echo "Virtual environment restored from cache, skipping pip install"
+            else
+              python3 -m venv .venv
+              source .venv/bin/activate
+              pip install -e .[dev-pinned,pinned]
+            fi
+      - save_cache:
+          key: pip-{{ checksum "pyproject.toml" }}-v1
+          paths:
+            - .venv
+            - ycms.egg-info
+            - /home/circleci/.cache/pip
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .venv
+            - ycms.egg-info
+  npm-install:
+    docker:
+      - image: "cimg/node:lts"
+    resource_class: small
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - npm-{{ checksum "package-lock.json" }}-v1
+      - run:
+          name: Install npm dependencies
+          command: |
+            if [[ -d "node_modules" ]]; then
+              echo "Node modules restored from cache, skipping npm install"
+            else
+              npm ci
+            fi
+      - save_cache:
+          key: npm-{{ checksum "package-lock.json" }}-v1
+          paths:
+            - node_modules
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
+  black:
+    docker:
+      - image: cimg/python:3.9.16
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Enable virtual environment
+          command: echo "source .venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Check black code style
+          command: black --check .
+  compile-translations:
+    docker:
+      - image: cimg/python:3.9.16
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install gettext
+          command: sudo apt-get update && sudo apt-get install gettext
+      - run:
+          name: Enable virtual environment
+          command: echo "source .venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Compile translation file
+          command: |
+            cd ycms
+            ycms-cli compilemessages --settings=ycms.core.circleci_settings
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ycms/locale/*/LC_MESSAGES/django.mo
+  djlint:
+    docker:
+      - image: cimg/python:3.9.16
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Enable virtual environment
+          command: echo "source .venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Check formatting of Django templates
+          command: djlint --check --lint ycms
+  eslint:
+    docker:
+      - image: "cimg/node:lts"
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Lint static CSS, JS & YAML files
+          command: npx eslint . --no-error-on-unmatched-pattern
+  isort:
+    docker:
+      - image: cimg/python:3.9.16
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Enable virtual environment
+          command: echo "source .venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Check isort code style
+          command: isort --check .
+  prettier:
+    docker:
+      - image: "cimg/node:lts"
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Check formatting of CSS & JS files
+          command: npx prettier --check .
+  pylint:
+    docker:
+      - image: "cimg/python:3.9.16"
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run pylint
+          command: ./tools/pylint.sh
+  webpack:
+    docker:
+      - image: "cimg/node:lts"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Compile and bundle CSS and JS
+          command: npm run prod
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ycms/static/dist
+            - ycms/webpack-stats.json
+  test:
+    docker:
+      - image: cimg/python:3.9.16
+      - image: cimg/postgres:14.1
+        environment:
+          POSTGRES_USER: ycms
+          POSTGRES_DB: ycms
+          POSTGRES_PASSWORD: password
+    resource_class: small
+    parallelism: 2
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Enable virtual environment
+          command: echo "source .venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Migrate database
+          command: |
+            cd ycms
+            ycms-cli migrate --settings=ycms.core.circleci_settings
+      - run:
+          name: Run tests
+          command: pytest --circleci-parallelize --disable-warnings --cov=ycms --cov-report xml --junitxml=test-results/junit.xml  --ds=ycms.core.circleci_settings
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+  check-translations:
+    docker:
+      - image: cimg/python:3.9.16
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install translation requirements
+          command: sudo apt-get update && sudo apt-get install gettext pcregrep
+      - run:
+          name: Check translation file for missing or empty entries
+          command: ./tools/check_translations.sh
+
+workflows:
+  main:
+    jobs:
+      - pip-install:
+          filters:
+            branches:
+              ignore: main
+      - npm-install:
+          filters:
+            branches:
+              ignore: main
+      - webpack:
+          requires:
+            - npm-install
+      - compile-translations:
+          requires:
+            - pip-install
+      - black:
+          requires:
+            - pip-install
+      - djlint:
+          requires:
+            - pip-install
+      - eslint:
+          requires:
+            - npm-install
+      - isort:
+          requires:
+            - pip-install
+      - prettier:
+          requires:
+            - npm-install
+      - pylint:
+          requires:
+            - pip-install
+      - shellcheck/check:
+          dir: ./tools
+          external_sources: true
+          filters:
+            branches:
+              ignore: main
+      - test:
+          requires:
+            - pip-install
+            - webpack
+      - check-translations:
+          requires:
+            - pip-install
+  deploy:
+    jobs:
+      - pip-install:
+          name: pip-install-deploy
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - npm-install:
+          name: npm-install-deploy
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - webpack:
+          name: webpack-deploy
+          requires:
+            - npm-install-deploy
+          filters:
+            tags:
+              only: /.*/
+      - compile-translations:
+          name: compile-translations-deploy
+          requires:
+            - pip-install-deploy
+          filters:
+            tags:
+              only: /.*/
